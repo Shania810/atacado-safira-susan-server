@@ -10,4 +10,13 @@ router.get('/product',async(req,res)=>{
         res.status(500).json({message: error.message})
     }
 })
+router.get('/product/:idProduct',async(req,res)=>{
+    const  {idProduct} = req.params
+    try {
+        const product = await Product.findById(idProduct)
+        res.status(200).json(product)
+    } catch (error) {
+        res.status(500).json({message: error.message})
+    }
+})
 module.exports = router
