@@ -9,4 +9,13 @@ router.get('/category',async(req,res)=>{
         res.status(500).json({message: error.message})
     }
 })
+router.post('/category',async(req,res)=>{
+    const category = req.body
+    try {
+      const newCategory = await Category.create(category)
+      res.status(201).json(newCategory)       
+    } catch (error) {
+        res.status(500).json({message: error.message})
+    }
+})
 module.exports = router
