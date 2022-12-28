@@ -18,4 +18,13 @@ router.post('/category',async(req,res)=>{
         res.status(500).json({message: error.message})
     }
 })
+router.delete('/category/:idCategory',async(req,res)=>{
+  const {idCategory} = req.params
+    try {
+      await Category.findByIdAndDelete(idCategory)
+      res.status(200).json('Deleted Category with sucess')
+    } catch (error) {
+      res.status(500).json({message: error.message})
+    }
+})
 module.exports = router
