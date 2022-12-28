@@ -28,6 +28,17 @@ router.post('/product',async(req,res)=>{
         res.status(500).json({message: error.message})
     }
 })
+router.put('/product/:idProduct',async(req,res)=>{
+   const {idProduct} = req.params
+   const update = req.body
+   console.log(idProduct,update)
+   try {
+    const updatedProduct = await Product.findByIdAndUpdate(idProduct,update,{new:true})
+    res.status(200).json(updatedProduct)
+   } catch (error) {
+    res.status(500).json({message: error.message})
+   }
+})
 router.delete('/product/:idProduct',async(req,res)=>{
     const {idProduct} = req.params
     try {
