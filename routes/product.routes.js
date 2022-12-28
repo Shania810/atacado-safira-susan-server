@@ -19,4 +19,22 @@ router.get('/product/:idProduct',async(req,res)=>{
         res.status(500).json({message: error.message})
     }
 })
+router.post('/product',async(req,res)=>{
+    const product = req.body
+    try {
+        const newProduct = await Product.create(product)
+        res.status(201).json(newProduct)
+    } catch (error) {
+        res.status(500).json({message: error.message})
+    }
+})
+router.delete('/product/:idProduct',async(req,res)=>{
+    const {idProduct} = req.params
+    try {
+     await Product.findByIdAndRemove(idProduct)
+     res.status(200).json('deleted with sucess')
+    } catch (error) {
+        res.status(500).json({message: error.message})
+    }
+})
 module.exports = router
