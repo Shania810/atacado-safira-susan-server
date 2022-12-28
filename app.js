@@ -6,7 +6,7 @@ const productRoutes = require('./routes/product.routes')
 connectDB()
 const app = express()
 app.use(morgan('dev'))
-app.use(cors())
+//app.use(cors())
 app.get('/',(req,res)=> res.send('deu certo'))
 app.use('/',productRoutes)
 module.exports = app

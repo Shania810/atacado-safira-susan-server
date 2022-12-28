@@ -6,4 +6,4 @@ const productSchema = new Schema({
     price:{type: Number,default:0},
     description:{type: String,required: [true,'description is required'],lowercase: true,trim: true}
 })
-module.exports = model(productSchema,'Product')
+module.exports = model('Product',productSchema)
