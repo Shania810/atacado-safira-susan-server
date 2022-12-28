@@ -19,10 +19,11 @@ router.get('/product/:idProduct',async(req,res)=>{
         res.status(500).json({message: error.message})
     }
 })
-router.post('/product',async(req,res)=>{
+router.post('/product/:idCategory',async(req,res)=>{
     const product = req.body
+    const {idCategory} = req.params
     try {
-        const newProduct = await Product.create(product)
+        const newProduct = await Product.create({...product,category: idCategory})
         res.status(201).json(newProduct)
     } catch (error) {
         res.status(500).json({message: error.message})
