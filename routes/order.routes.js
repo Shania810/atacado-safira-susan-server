@@ -12,7 +12,13 @@ router.get('/order', async (req, res) => {
 router.get('/order/:idOrder', async (req, res) => {
     const { idOrder } = req.params
     try {
-        const order = await Order.findById(idOrder)
+        const order = await Order.findById(idOrder).populate({
+            path: 'order_items',
+            populate: {
+                path: 'product',
+                model: 'Product'
+            }
+        })
         res.status(200).json(order)
     } catch (error) {
         res.status(500).json({ message: error.message })
