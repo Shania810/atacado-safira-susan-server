@@ -23,7 +23,14 @@ router.post('/order',async(req,res)=>{
     try {
         const newOrder = await Order.create({seller: seller})
         await Order.findOneAndUpdate(newOrder._id,{$push: {order_items :{$each : orderItems }}})
-        const order = await Order.findById(newOrder._id)
+        const order = await Order.findById(newOrder._id).populate({ 
+            path: 'order_items',
+            populate: {
+              path: 'product',
+              model: 'Product'
+            } 
+         })
+       
         res.status(201).json(order)
     } catch (error) {
        res.status(500).json({message: error.message})

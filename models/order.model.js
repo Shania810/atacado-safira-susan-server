@@ -4,6 +4,6 @@ const orderSchema = new Schema({
       product:{type: Schema.Types.ObjectId, ref:'Product',required: true},
       quantity:{type: Number,required: true}
    }],
-   seller:{type: String}
+   seller:{type: String,lowercase: true,trim: true}
 },{timestamps: true})
 module.exports = model('Order',orderSchema)
