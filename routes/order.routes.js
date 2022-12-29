@@ -19,10 +19,12 @@ router.get('/order/:idOrder',async(req,res)=>{
    }
 })
 router.post('/order',async(req,res)=>{
-    const order = req.body
+    const {orderItems,seller} = req.body
     try {
-      const newOrder = await Order.create(order)
-      res.status(201).json(newOrder)
+        const newOrder = await Order.create({seller: seller})
+        await Order.findOneAndUpdate(newOrder._id,{$push: {order_items :{$each : orderItems }}})
+        const order = await Order.findById(newOrder._id)
+        res.status(201).json(order)
     } catch (error) {
        res.status(500).json({message: error.message})
     }
@@ -38,7 +40,7 @@ router.put('/order/:idOrder',async(req,res)=>{
     }
 })
 router.delete('/order/:idOrder',async(req,res)=>{
-    const idOrder = req.params
+    const {idOrder} = req.params
     try {
         await Order.findByIdAndDelete(idOrder)
         res.status(200).json('Successfully deleted order')
