@@ -13,9 +13,19 @@ router.post('/order',async(req,res)=>{
     const order = req.body
     try {
       const newOrder = await Order.create(order)
-      res.status(200).json(newOrder)
+      res.status(201).json(newOrder)
     } catch (error) {
        res.status(500).json({message: error.message})
+    }
+})
+router.put('/order/:idOrder',async(req,res)=>{
+    const {idOrder} = req.params
+    const update = req.body
+    try {
+        const updatedOrder = await Order.findByIdAndUpdate(idOrder,update,{new:true})
+        res.status(200).json(updatedOrder)
+    } catch (error) {
+        res.status(500).json({message: error.message})
     }
 })
 module.exports = router
