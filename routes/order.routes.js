@@ -9,6 +9,15 @@ router.get('/order',async(req,res)=>{
     res.status(500).json({message: error.message})
    }
 })
+router.get('/order/:idOrder',async(req,res)=>{
+    const {idOrder} = req.params
+   try {
+    const order = await Order.findById(idOrder)
+    res.status(200).json(order)
+   } catch (error) {
+    res.status(500).json({message: error.message})
+   }
+})
 router.post('/order',async(req,res)=>{
     const order = req.body
     try {
