@@ -1,5 +1,6 @@
 const { Router } = require('express')
 const Order = require('../models/order.model')
+const Product = require('../models/product.model')
 const router = Router()
 router.get('/order', async (req, res) => {
     try {
@@ -42,7 +43,21 @@ router.post('/order', async (req, res) => {
                 model: 'Product'
             }
         })
-
+        let total = 0
+        const updatedProduct = async(item)=>{
+            await Product.findByIdAndUpdate(item._id,{stock: item.product.stock - item.quantity })
+        }
+        order.order_items.forEach((item) => {
+            item.total = 0
+            updatedProduct(item)
+          if(item.quantity < 6){
+             item.total = item.product.retail_price * item.quantity 
+          }else{
+             item.total = item.product.wholesale_price * item.quantity
+          } 
+            total += item.total
+        });
+        order.total = total
         res.status(201).json(order)
     } catch (error) {
         res.status(500).json({ message: error.message })
@@ -52,8 +67,15 @@ router.put('/order/:idOrder', async (req, res) => {
     const { idOrder } = req.params
     const update = req.body
     try {
-        const updatedOrder = await Order.findByIdAndUpdate(idOrder, update, { new: true })
-        res.status(200).json(updatedOrder)
+        await Order.findOneAndUpdate(idOrder, update, { new: true })
+        const order = await Order.findById(idOrder).populate({
+            path: 'order_items',
+            populate: {
+                path: 'product',
+                model: 'Product'
+            }
+        })
+        res.status(200).json(order)
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
