@@ -4,7 +4,7 @@ const Order = require('../models/order.model')
 const router = Router()
 router.get('/product', async (req, res) => {
     try {
-        const products = await Product.find()
+        const products = await Product.find().populate('category')
         res.status(200).json(products)
 
     } catch (error) {
@@ -14,7 +14,7 @@ router.get('/product', async (req, res) => {
 router.get('/product/:idProduct', async (req, res) => {
     const { idProduct } = req.params
     try {
-        const product = await Product.findById(idProduct)
+        const product = await Product.findById(idProduct).populate('category')
         res.status(200).json(product)
     } catch (error) {
         res.status(500).json({ message: error.message })
