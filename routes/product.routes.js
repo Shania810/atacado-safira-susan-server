@@ -1,5 +1,6 @@
 const { Router } = require('express')
 const Product = require('../models/product.model')
+const Order = require('../models/order.model')
 const router = Router()
 router.get('/product', async (req, res) => {
     try {
@@ -29,10 +30,29 @@ router.post('/product/:idCategory', async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 })
+router.put('/product/stock/:idOrder', async (req, res) => {
+    const { idOrder } = req.params
+    try {
+        const order = await Order.findById(idOrder).populate({
+            path: 'order_items',
+            populate: {
+                path: 'product',
+                model: 'Product'
+            }
+        })
+        const orderItems = order.order_items
+        for (const item of orderItems) {
+            const product = await Product.findById(item.product._id)
+            await Product.findByIdAndUpdate(item.product._id, { stock: product.stock - item.quantity })
+        }
+        res.status(200).json(order)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+})
 router.put('/product/:idProduct', async (req, res) => {
     const { idProduct } = req.params
     const update = req.body
-    console.log(idProduct, update)
     try {
         const updatedProduct = await Product.findByIdAndUpdate(idProduct, update, { new: true })
         res.status(200).json(updatedProduct)

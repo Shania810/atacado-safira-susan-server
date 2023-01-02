@@ -11,6 +11,19 @@ router.get('/order', async (req, res) => {
                 model: 'Product'
             }
         })
+        for (const order of orders) {
+            let total = 0
+            order.order_items.forEach((item) => {
+                item.total = 0
+                if (item.quantity < 6) {
+                    item.total = item.product.retail_price * item.quantity
+                } else {
+                    item.total = item.product.wholesale_price * item.quantity
+                }
+                total += item.total
+            });
+            order.total = total
+        }
         res.status(200).json(orders)
     } catch (error) {
         res.status(500).json({ message: error.message })
@@ -26,6 +39,17 @@ router.get('/order/:idOrder', async (req, res) => {
                 model: 'Product'
             }
         })
+        let total = 0
+        order.order_items.forEach((item) => {
+            item.total = 0
+            if (item.quantity < 6) {
+                item.total = item.product.retail_price * item.quantity
+            } else {
+                item.total = item.product.wholesale_price * item.quantity
+            }
+            total += item.total
+        });
+        order.total = total
         res.status(200).json(order)
     } catch (error) {
         res.status(500).json({ message: error.message })
@@ -43,21 +67,14 @@ router.post('/order', async (req, res) => {
                 model: 'Product'
             }
         })
-        let total = 0
-        const updatedProduct = async(item)=>{
-            await Product.findByIdAndUpdate(item._id,{stock: item.product.stock - item.quantity })
-        }
         order.order_items.forEach((item) => {
-            item.total = 0
-            updatedProduct(item)
-          if(item.quantity < 6){
-             item.total = item.product.retail_price * item.quantity 
-          }else{
-             item.total = item.product.wholesale_price * item.quantity
-          } 
-            total += item.total
+            if (item.quantity < 6) {
+                item.total = item.product.retail_price * item.quantity
+            } else {
+                item.total = item.product.wholesale_price * item.quantity
+            }
+            order.total += item.total
         });
-        order.total = total
         res.status(201).json(order)
     } catch (error) {
         res.status(500).json({ message: error.message })
