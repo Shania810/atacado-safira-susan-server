@@ -61,7 +61,14 @@ router.put('/product/stock/:idOrder', async (req, res) => {
 })
 router.put('/product/:idProduct', async (req, res) => {
     const { idProduct } = req.params
-    const update = req.body
+    const { name, category, retail_price, wholesale_price, stock, description } = req.body
+    const update = {}
+    if (name) update.name = name
+    if (category) update.category = category
+    if (retail_price) update.retail_price = retail_price
+    if (wholesale_price) update.wholesale_price = wholesale_price
+    if (stock) update.stock = stock
+    if (description) update.description = description
     try {
         const updatedProduct = await Product.findByIdAndUpdate(idProduct, update, { new: true })
         res.status(200).json(updatedProduct)
