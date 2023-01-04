@@ -1,5 +1,6 @@
 const { Router } = require('express')
 const Product = require('../models/product.model')
+const Category = require('../models/category.model')
 const Order = require('../models/order.model')
 const router = Router()
 router.get('/product', async (req, res) => {
@@ -28,11 +29,11 @@ router.get('/product/:idProduct', async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 })
-router.post('/product/:idCategory', async (req, res) => {
+router.post('/product', async (req, res) => {
     const product = req.body
-    const { idCategory } = req.params
     try {
-        const newProduct = await Product.create({ ...product, category: idCategory })
+        const category = await Category.findOne({ name: product.category })
+        const newProduct = await Product.create({ ...product, category: category._id })
         res.status(201).json(newProduct)
     } catch (error) {
         res.status(500).json({ message: error.message })
