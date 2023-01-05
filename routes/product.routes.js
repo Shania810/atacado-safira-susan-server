@@ -29,13 +29,18 @@ router.get('/product/:idProduct', async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 })
-router.get('/product/search/:key',async(req,res)=>{
-    const {key} = req.params
+router.get('/product/search/:key', async (req, res) => {
+    const { key } = req.params
     try {
-        const search = await Product.find({name: {$regex: key}})
+        let search
+        if (key === 'false') {
+            search = await Product.find().populate('category')
+        } else {
+            search = await Product.find({ name: { $regex: key } })
+        }
         res.status(200).json(search)
     } catch (error) {
-        res.status(500).json({message: error.message})
+        res.status(500).json({ message: error.message })
     }
 })
 router.post('/product', async (req, res) => {
@@ -79,11 +84,11 @@ router.put('/product/:idProduct', async (req, res) => {
     if (description) update.description = description
     try {
         let updatedProduct
-        if(category){
-          category = await Category.findOne({name: category})
-          updatedProduct = await Product.findByIdAndUpdate(idProduct,{...update,category: category._id}, { new: true })
-        }else{
-          updatedProduct = await Product.findByIdAndUpdate(idProduct, update, { new: true })
+        if (category) {
+            category = await Category.findOne({ name: category })
+            updatedProduct = await Product.findByIdAndUpdate(idProduct, { ...update, category: category._id }, { new: true })
+        } else {
+            updatedProduct = await Product.findByIdAndUpdate(idProduct, update, { new: true })
         }
         res.status(200).json(updatedProduct)
     } catch (error) {
