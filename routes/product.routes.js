@@ -29,6 +29,15 @@ router.get('/product/:idProduct', async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 })
+router.get('/product/search/:key',async(req,res)=>{
+    const {key} = req.params
+    try {
+        const search = await Product.find({name: {$regex: key}})
+        res.status(200).json(search)
+    } catch (error) {
+        res.status(500).json({message: error.message})
+    }
+})
 router.post('/product', async (req, res) => {
     const product = req.body
     try {
@@ -64,13 +73,18 @@ router.put('/product/:idProduct', async (req, res) => {
     const { name, category, retail_price, wholesale_price, stock, description } = req.body
     const update = {}
     if (name) update.name = name
-    if (category) update.category = category
     if (retail_price) update.retail_price = retail_price
     if (wholesale_price) update.wholesale_price = wholesale_price
     if (stock) update.stock = stock
     if (description) update.description = description
     try {
-        const updatedProduct = await Product.findByIdAndUpdate(idProduct, update, { new: true })
+        let updatedProduct
+        if(category){
+          category = await Category.findOne({name: category})
+          updatedProduct = await Product.findByIdAndUpdate(idProduct,{...update,category: category._id}, { new: true })
+        }else{
+          updatedProduct = await Product.findByIdAndUpdate(idProduct, update, { new: true })
+        }
         res.status(200).json(updatedProduct)
     } catch (error) {
         res.status(500).json({ message: error.message })
