@@ -24,10 +24,12 @@ router.post('/signup',async(req,res)=>{
       const salt = bycrypt.genSaltSync(10)
       const passwordHash = bycrypt.hashSync(password,salt)
 
-      const newUser = await User.create({name,passwordHash}) 
-      res.status(201).json(newUser)
-      
+      const newUser = await User.create({name,passwordHash,role:'Seller'}) 
+      res.status(201).json({_id: newUser._id,name: newUser.name,role: newUser.role})
+
     } catch (error) {
         res.status(500).json({message: error.message})
     }
 })
+
+module.exports = router
