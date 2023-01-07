@@ -11,6 +11,9 @@ const app = express()
 app.use(morgan('dev'))
 app.use(cors())
 app.use(express.json())
+
+app.use(require('./middlewares/auth.middleware'))
+
 app.use('/',authRoutes)
 app.use('/', productRoutes)
 app.use('/', categoryRoutes)
