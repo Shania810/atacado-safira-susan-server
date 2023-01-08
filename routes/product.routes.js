@@ -13,15 +13,17 @@ router.get('/product', async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 })
+
 router.get('/productFiltered/:idCategory', async (req, res) => {
     const { idCategory } = req.params
     try {
         const products = await Product.find({ category: idCategory }).populate('category')
         res.status(200).json(products)
     } catch (error) {
-
+        res.status(500).json({message: error.message})
     }
 })
+
 router.get('/product/:idProduct', async (req, res) => {
     const { idProduct } = req.params
     try {
@@ -31,6 +33,7 @@ router.get('/product/:idProduct', async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 })
+
 router.get('/product/search/:key', async (req, res) => {
     const { key } = req.params
     try {
@@ -45,6 +48,7 @@ router.get('/product/search/:key', async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 })
+
 router.post('/product', isAdmin, async (req, res) => {
     const product = req.body
     try {
@@ -55,6 +59,7 @@ router.post('/product', isAdmin, async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 })
+
 router.put('/product/stock/:idOrder', async (req, res) => {
     const { idOrder } = req.params
     try {
@@ -75,20 +80,14 @@ router.put('/product/stock/:idOrder', async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 })
+
 router.put('/product/:idProduct', isAdmin, async (req, res) => {
     const { idProduct } = req.params
-    const { name, category, retail_price, wholesale_price, stock, description,commission_amount } = req.body
-    const update = {}
-    if (name) update.name = name
-    if (retail_price) update.retail_price = retail_price
-    if (wholesale_price) update.wholesale_price = wholesale_price
-    if (stock) update.stock = stock
-    if (description) update.description = description
-    if(commission_amount) update.commission_amount = commission_amount
+    const update = req.body
     try {
         let updatedProduct
-        if (category) {
-            category = await Category.findOne({ name: category })
+        if (update.category) {
+            const category = await Category.findOne({ name: update.category })
             updatedProduct = await Product.findByIdAndUpdate(idProduct, { ...update, category: category._id }, { new: true })
         } else {
             updatedProduct = await Product.findByIdAndUpdate(idProduct, update, { new: true })
@@ -98,6 +97,7 @@ router.put('/product/:idProduct', isAdmin, async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 })
+
 router.delete('/product/:idProduct', isAdmin, async (req, res) => {
     const { idProduct } = req.params
     try {
@@ -107,4 +107,5 @@ router.delete('/product/:idProduct', isAdmin, async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 })
+
 module.exports = router
