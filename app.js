@@ -12,9 +12,10 @@ app.use(morgan('dev'))
 app.use(cors())
 app.use(express.json())
 
+app.use('/',authRoutes)
+
 app.use(require('./middlewares/auth.middleware'))
 
-app.use('/',authRoutes)
 app.use('/', productRoutes)
 app.use('/', categoryRoutes)
 app.use('/', orderRoutes)
