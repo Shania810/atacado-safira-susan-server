@@ -4,13 +4,12 @@ const Product = require('../models/product.model')
 const router = Router()
 router.get('/order', async (req, res) => {
     try {
-        const orders = await Order.find({}).sort({ createdAt: -1 }).populate({
+        const orders = await Order.find({}).sort({ createdAt: -1 }).populate('client seller').populate({
             path: 'order_items',
-            populate: {
+            populate:{
                 path: 'product',
                 model: 'Product'
-            }
-        }).lean()
+            }}).lean()
         for (const order of orders) {
             let total = 0
             order.order_items.forEach((item) => {
@@ -32,13 +31,15 @@ router.get('/order', async (req, res) => {
 router.get('/order/:idOrder', async (req, res) => {
     const { idOrder } = req.params
     try {
-        const order = await Order.findById(idOrder).populate({
+        const order = await Order.findById(idOrder).populate('client seller').populate([{
             path: 'order_items',
             populate: {
                 path: 'product',
                 model: 'Product'
             }
-        }).lean()
+        },{
+            path:'client'
+        }]).lean()
         let total = 0
         order.order_items.forEach((item) => {
             item.total = 0
@@ -57,25 +58,27 @@ router.get('/order/:idOrder', async (req, res) => {
 })
 router.post('/order', async (req, res) => {
     const user = req.user
-    const { orderItems } = req.body
+    const { client,orderItems } = req.body
     try {
-        const newOrder = await Order.create({ seller: user._id }).lean()
+        const newOrder = await Order.create({ seller: user._id,client})
         await Order.findOneAndUpdate(newOrder._id, { $push: { order_items: { $each: orderItems } } })
-        const order = await Order.findById(newOrder._id).populate({
+        const order = await Order.findById(newOrder._id).populate('seller client').populate({
             path: 'order_items',
             populate: {
                 path: 'product',
                 model: 'Product'
             }
         }).lean()
+        let total = 0
         order.order_items.forEach((item) => {
             if (item.quantity < 6) {
                 item.total = item.product.retail_price * item.quantity
             } else {
                 item.total = item.product.wholesale_price * item.quantity
             }
-            order.total += item.total
+            total += item.total
         });
+        order.total = total
         res.status(201).json(order)
     } catch (error) {
         res.status(500).json({ message: error.message })
@@ -86,7 +89,7 @@ router.put('/order/:idOrder', async (req, res) => {
     const update = req.body
     try {
         await Order.findOneAndUpdate(idOrder, update, { new: true })
-        const order = await Order.findById(idOrder).populate({
+        const order = await Order.findById(idOrder).populate('client seller').populate({
             path: 'order_items',
             populate: {
                 path: 'product',
@@ -101,14 +104,15 @@ router.put('/order/:idOrder', async (req, res) => {
 router.delete('/order/:idOrder', async (req, res) => {
     const { idOrder } = req.params
     try {
-        const order = Order.findById(idOrder).populate({
+        const order = await Order.findById(idOrder).populate({
             path: 'order_items',
             populate: {
                 path: 'product',
                 model: 'Product'
             }
         })
-        for (const item of order.order_items) {
+        const orderItems = order.order_items
+        for (const item of orderItems) {
             await Product.findByIdAndUpdate(item.product._id, { stock: item.product.stock + item.quantity })
         }
         await Order.findByIdAndDelete(idOrder)
