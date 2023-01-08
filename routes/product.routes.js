@@ -77,13 +77,14 @@ router.put('/product/stock/:idOrder', async (req, res) => {
 })
 router.put('/product/:idProduct', isAdmin, async (req, res) => {
     const { idProduct } = req.params
-    const { name, category, retail_price, wholesale_price, stock, description } = req.body
+    const { name, category, retail_price, wholesale_price, stock, description,commission_amount } = req.body
     const update = {}
     if (name) update.name = name
     if (retail_price) update.retail_price = retail_price
     if (wholesale_price) update.wholesale_price = wholesale_price
     if (stock) update.stock = stock
     if (description) update.description = description
+    if(commission_amount) update.commission_amount = commission_amount
     try {
         let updatedProduct
         if (category) {
