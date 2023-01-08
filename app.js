@@ -7,6 +7,7 @@ const productRoutes = require('./routes/product.routes')
 const categoryRoutes = require('./routes/category.routes')
 const orderRoutes = require('./routes/order.routes')
 const sellerRoutes = require('./routes/seller.routes')
+const clientRoutes = require('./routes/client.routes')
 
 connectDB()
 const app = express()
@@ -22,5 +23,6 @@ app.use('/', productRoutes)
 app.use('/', categoryRoutes)
 app.use('/', orderRoutes)
 app.use('/',sellerRoutes)
+app.use('/',clientRoutes)
 
 module.exports = app

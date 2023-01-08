@@ -11,6 +11,16 @@ router.get('/client', async (req, res) => {
     }
 })
 
+router.get('/client/:idClient', async (req,res) => {
+    const { idClient } = req.params
+    try {
+        const client = await Client.findById(idClient)
+        res.status(200).json(client)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+})
+
 router.get('/client/search/:key', async (req, res) => {
     const { key } = req.params
     try {
