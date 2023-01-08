@@ -45,7 +45,7 @@ router.get('/product/search/:key', async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 })
-router.post('/product',isAdmin, async (req, res) => {
+router.post('/product', isAdmin, async (req, res) => {
     const product = req.body
     try {
         const category = await Category.findOne({ name: product.category })
@@ -55,7 +55,7 @@ router.post('/product',isAdmin, async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 })
-router.put('/product/stock/:idOrder',isAdmin, async (req, res) => {
+router.put('/product/stock/:idOrder', async (req, res) => {
     const { idOrder } = req.params
     try {
         const order = await Order.findById(idOrder).populate({
@@ -75,7 +75,7 @@ router.put('/product/stock/:idOrder',isAdmin, async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 })
-router.put('/product/:idProduct',isAdmin, async (req, res) => {
+router.put('/product/:idProduct', isAdmin, async (req, res) => {
     const { idProduct } = req.params
     const { name, category, retail_price, wholesale_price, stock, description } = req.body
     const update = {}
@@ -97,7 +97,7 @@ router.put('/product/:idProduct',isAdmin, async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 })
-router.delete('/product/:idProduct',isAdmin, async (req, res) => {
+router.delete('/product/:idProduct', isAdmin, async (req, res) => {
     const { idProduct } = req.params
     try {
         await Product.findByIdAndRemove(idProduct)

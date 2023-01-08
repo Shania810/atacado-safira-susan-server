@@ -6,6 +6,6 @@ const orderSchema = new Schema({
       total: {type: Number,required:true}
    }],
    total: { type: Number,default: 0},
-   seller: { type: String, lowercase: true, trim: true }
+   seller: {type: Schema.Types.ObjectId, ref: 'User',required: true}
 }, { timestamps: true })
 module.exports = model('Order', orderSchema)

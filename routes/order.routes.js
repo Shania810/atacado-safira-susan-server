@@ -56,9 +56,10 @@ router.get('/order/:idOrder', async (req, res) => {
     }
 })
 router.post('/order', async (req, res) => {
-    const { orderItems, seller } = req.body
+    const user = req.user
+    const { orderItems } = req.body
     try {
-        const newOrder = await Order.create({ seller: seller })
+        const newOrder = await Order.create({ seller: user._id })
         await Order.findOneAndUpdate(newOrder._id, { $push: { order_items: { $each: orderItems } } })
         const order = await Order.findById(newOrder._id).populate({
             path: 'order_items',
