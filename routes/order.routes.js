@@ -10,7 +10,7 @@ router.get('/order', async (req, res) => {
                 path: 'product',
                 model: 'Product'
             }
-        })
+        }).lean()
         for (const order of orders) {
             let total = 0
             order.order_items.forEach((item) => {
@@ -38,7 +38,7 @@ router.get('/order/:idOrder', async (req, res) => {
                 path: 'product',
                 model: 'Product'
             }
-        })
+        }).lean()
         let total = 0
         order.order_items.forEach((item) => {
             item.total = 0
@@ -59,7 +59,7 @@ router.post('/order', async (req, res) => {
     const user = req.user
     const { orderItems } = req.body
     try {
-        const newOrder = await Order.create({ seller: user._id })
+        const newOrder = await Order.create({ seller: user._id }).lean()
         await Order.findOneAndUpdate(newOrder._id, { $push: { order_items: { $each: orderItems } } })
         const order = await Order.findById(newOrder._id).populate({
             path: 'order_items',
@@ -67,7 +67,7 @@ router.post('/order', async (req, res) => {
                 path: 'product',
                 model: 'Product'
             }
-        })
+        }).lean()
         order.order_items.forEach((item) => {
             if (item.quantity < 6) {
                 item.total = item.product.retail_price * item.quantity
