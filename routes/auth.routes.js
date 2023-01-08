@@ -39,19 +39,21 @@ router.post('/login', async (req, res) => {
     const user = await User.findOne({ name })
     if (!user) {
       res.status(400).json({ message: 'Usuário não está registrado' })
+      return
     }
     const compareHash = bycrypt.compareSync(password, user.passwordHash)
     if (!compareHash) {
       res.status(400).json({ message: 'Nome de usuário ou senha inválida' })
+      return
     }
-
+  
     const payload = {
       _id: user._id,
       name: user.name,
       role: user.role
     }
 
-    const token = await jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '3d' })
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '3d' })
     res.status(200).json({ ...payload, token })
   } catch (error) {
     res.status(500).json({ message: error.message })
