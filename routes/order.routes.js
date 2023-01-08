@@ -101,6 +101,16 @@ router.put('/order/:idOrder', async (req, res) => {
 router.delete('/order/:idOrder', async (req, res) => {
     const { idOrder } = req.params
     try {
+        const order = Order.findById(idOrder).populate({
+            path: 'order_items',
+            populate: {
+                path: 'product',
+                model: 'Product'
+            }
+        })
+        for (const item of order.order_items) {
+            await Product.findByIdAndUpdate(item.product._id, { stock: item.product.stock + item.quantity })
+        }
         await Order.findByIdAndDelete(idOrder)
         res.status(200).json('Successfully deleted order')
     } catch (error) {
