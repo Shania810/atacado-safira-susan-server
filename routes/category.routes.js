@@ -1,6 +1,8 @@
 const { Router } = require('express')
 const Category = require('../models/category.model')
+const isAdmin = require('../middlewares/user.middleware')
 const router = Router()
+
 router.get('/category', async (req, res) => {
   try {
     const categories = await Category.find()
@@ -9,7 +11,7 @@ router.get('/category', async (req, res) => {
     res.status(500).json({ message: error.message })
   }
 })
-router.post('/category', async (req, res) => {
+router.post('/category',isAdmin, async (req, res) => {
   const category = req.body
   try {
     const newCategory = await Category.create(category)
@@ -18,7 +20,7 @@ router.post('/category', async (req, res) => {
     res.status(500).json({ message: error.message })
   }
 })
-router.delete('/category/:idCategory', async (req, res) => {
+router.delete('/category/:idCategory',isAdmin, async (req, res) => {
   const { idCategory } = req.params
   try {
     await Category.findByIdAndDelete(idCategory)
