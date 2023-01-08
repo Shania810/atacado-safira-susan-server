@@ -1,5 +1,6 @@
-const { Router } = require("express");
+const { Router } = require('express')
 const Client = require('../models/client.model')
+const isAdmin = require('../middlewares/user.middleware')
 const router = Router()
 
 router.get('/client', async (req, res) => {
@@ -36,7 +37,7 @@ router.get('/client/search/:key', async (req, res) => {
     }
 })
 
-router.post('/client', async (req, res) => {
+router.post('/client',isAdmin, async (req, res) => {
     const { name, address, phone, cpf, cnpj } = req.body
     try {
         let newClient
@@ -51,7 +52,7 @@ router.post('/client', async (req, res) => {
     }
 })
 
-router.put('/client/:idClient', async (req, res) => {
+router.put('/client/:idClient',isAdmin, async (req, res) => {
     const { idClient } = req.params
     const { name, address, phone, cnpj, cpf } = req.body
     try {
@@ -66,7 +67,7 @@ router.put('/client/:idClient', async (req, res) => {
     }
 })
 
-router.delete('/client/:idClient', async (req, res) => {
+router.delete('/client/:idClient',isAdmin, async (req, res) => {
     const { idClient } = req.params
     try {
         await Client.findByIdAndRemove(idClient)
