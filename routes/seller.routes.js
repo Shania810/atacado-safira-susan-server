@@ -26,16 +26,20 @@ router.get('/seller/:idSeller', isAdmin, async (req, res) => {
         }).lean()
         orders.forEach(order => {
             let total = 0
+            let commission_total = 0
             order.order_items.forEach((item) => {
             item.total = 0
+            item.commission_total = item.product.commission_amount * item.quantity
             if (item.quantity < 6) {
                 item.total = item.product.retail_price * item.quantity
             } else {
                 item.total = item.product.wholesale_price * item.quantity
             }
+            commission_total += item.commission_total
             total += item.total
         });
         order.total = total
+        order.commission_total = commission_total
         });
         
         user.orders = orders
