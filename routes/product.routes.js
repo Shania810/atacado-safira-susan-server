@@ -50,10 +50,10 @@ router.get('/product/search/:key', async (req, res) => {
 })
 
 router.post('/product', isAdmin, async (req, res) => {
-    const product = req.body
+    const {name,stock,commission_amount,price,wholesale_price,retail_price,description,category} = req.body
     try {
-        const category = await Category.findOne({ name: product.category })
-        const newProduct = await Product.create({ ...product, category: category._id })
+        const categoryFounded = await Category.findOne({name: category})
+        const newProduct = await Product.create({ name,stock,commission_amount,price,wholesale_price,retail_price,description, category: categoryFounded._id })
         res.status(201).json(newProduct)
     } catch (error) {
         res.status(500).json({ message: error.message })
