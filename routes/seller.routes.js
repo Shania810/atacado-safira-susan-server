@@ -17,7 +17,7 @@ router.get('/seller/:idSeller', isAdmin, async (req, res) => {
     const { idSeller } = req.params
     try {
         const user = await User.findById(idSeller).lean()
-        const orders = await Order.find({seller: user._id}).populate('seller').populate({
+        const orders = await Order.find({seller: user._id}).populate('client seller').populate({
             path: 'order_items',
             populate: {
                 path: 'product',
