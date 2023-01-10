@@ -33,13 +33,15 @@ router.get('/profit',async(req,res)=>{
             order.total = total   
     });
     const ordersDate = orders.map((order)=> order.date)
+    const dateOrdersUnique = [...new Set(ordersDate)]
+
     const sumProfitByDay = (date) =>{
       const ordersFilteredByDate = orders.filter((order)=> order.date === date)
       const profitByOrder = ordersFilteredByDate.map((order)=> order.profit)
       return profitByOrder.reduce((acc,cu)=> acc + cu,0)
 
     }
-    const profitsByDate = ordersDate.map((date)=>{return {date,profit: sumProfitByDay(date)}}) 
+    const profitsByDate = dateOrdersUnique.map((date)=>{return {date,profit: sumProfitByDay(date)}}) 
     res.status(200).json(profitsByDate)
    } catch (error) {
     res.status(500).json({message: error.message})
