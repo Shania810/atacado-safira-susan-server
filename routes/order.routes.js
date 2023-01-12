@@ -7,22 +7,23 @@ router.get('/order', async (req, res) => {
     try {
         const orders = await Order.find({}).sort({ createdAt: -1 }).populate('client seller').populate({
             path: 'order_items',
-            populate:{
+            populate: {
                 path: 'product',
                 model: 'Product'
-            }}).lean()
+            }
+        }).lean()
         for (const order of orders) {
             let total = 0
             order.order_items.forEach((item) => {
                 item.total = 0
                 if (item.quantity < 6) {
-                    item.total = item.product.retail_price * item.quantity
+                    item.total = parseFloat(item.product.retail_price * item.quantity).toFixed(2)
                 } else {
-                    item.total = item.product.wholesale_price * item.quantity
+                    item.total = parseFloat(item.product.wholesale_price * item.quantity).toFixed(2)
                 }
                 total += item.total
             });
-            order.total = total
+            order.total = parseFloat(total).toFixed(2)
         }
         res.status(200).json(orders)
     } catch (error) {
@@ -44,13 +45,13 @@ router.get('/order/:idOrder', async (req, res) => {
         order.order_items.forEach((item) => {
             item.total = 0
             if (item.quantity < 6) {
-                item.total = item.product.retail_price * item.quantity
+                item.total = parseFloat(item.product.retail_price * item.quantity).toFixed(2)
             } else {
-                item.total = item.product.wholesale_price * item.quantity
+                item.total = parseFloat(item.product.wholesale_price * item.quantity).toFixed(2)
             }
             total += item.total
         });
-        order.total = total
+        order.total = parseFloat(total).toFixed(2)
         res.status(200).json(order)
     } catch (error) {
         res.status(500).json({ message: error.message })
@@ -59,9 +60,9 @@ router.get('/order/:idOrder', async (req, res) => {
 
 router.post('/order', async (req, res) => {
     const user = req.user
-    const { client,orderItems,payment } = req.body
+    const { client, orderItems, payment } = req.body
     try {
-        const newOrder = await Order.create({ seller: user._id,client,payment})
+        const newOrder = await Order.create({ seller: user._id, client, payment })
         await Order.findOneAndUpdate(newOrder._id, { $push: { order_items: { $each: orderItems } } })
         const order = await Order.findById(newOrder._id).populate('seller client').populate({
             path: 'order_items',
@@ -73,13 +74,13 @@ router.post('/order', async (req, res) => {
         let total = 0
         order.order_items.forEach((item) => {
             if (item.quantity < 6) {
-                item.total = item.product.retail_price * item.quantity
+                item.total = parseFloat(item.product.retail_price * item.quantity).toFixed(2)
             } else {
-                item.total = item.product.wholesale_price * item.quantity
+                item.total = parseFloat(item.product.wholesale_price * item.quantity).toFixed(2)
             }
             total += item.total
         });
-        order.total = total
+        order.total = parseFloat(total).toFixed(2)
         res.status(201).json(order)
     } catch (error) {
         res.status(500).json({ message: error.message })

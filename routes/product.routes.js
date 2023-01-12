@@ -50,7 +50,12 @@ router.get('/product/search/:key', async (req, res) => {
 })
 
 router.post('/product', isAdmin, async (req, res) => {
-    const {name,stock,commission_amount,price,wholesale_price,retail_price,description,category} = req.body
+    let {name,stock,commission_amount,price,wholesale_price,retail_price,description,category} = req.body
+    commission_amount = parseFloat(commission_amount).toFixed(2)
+    price = parseFloat(price).toFixed(2)
+    wholesale_price = parseFloat(wholesale_price).toFixed(2)
+    retail_price = parseFloat(retail_price).toFixed(2)
+
     try {
         const categoryFounded = await Category.findOne({name: category})
         const newProduct = await Product.create({ name,stock,commission_amount,price,wholesale_price,retail_price,description, category: categoryFounded._id })
