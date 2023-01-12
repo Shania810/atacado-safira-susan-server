@@ -1,12 +1,10 @@
 const { Router } = require("express");
 const Order = require('../models/order.model')
+const isAdmin = require('../middlewares/user.middleware')
 const router = Router() 
 
-router.get('/profit',async(req,res)=>{
-    const now = new Date()
-    const dateNow = now.getDate()
+router.get('/profit',isAdmin,async(req,res)=>{
     const months = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro']
-
    try {
     const orders = await Order.find().sort({createdAt: -1}) .populate({
         path: 'order_items',
@@ -38,8 +36,8 @@ router.get('/profit',async(req,res)=>{
     const sumProfitByDay = (date) =>{
       const ordersFilteredByDate = orders.filter((order)=> order.date === date)
       const profitByOrder = ordersFilteredByDate.map((order)=> order.profit)
-      return profitByOrder.reduce((acc,cu)=> acc + cu,0)
-
+      const sumProfitByOrder = profitByOrder.reduce((acc,cu)=> acc + cu,0)
+      return parseFloat(sumProfitByOrder).toFixed(2)
     }
     const profitsByDate = dateOrdersUnique.map((date)=>{return {date,profit: sumProfitByDay(date)}}) 
     res.status(200).json(profitsByDate)

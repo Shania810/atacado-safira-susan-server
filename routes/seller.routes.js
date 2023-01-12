@@ -31,15 +31,15 @@ router.get('/seller/:idSeller', isAdmin, async (req, res) => {
             item.total = 0
             item.commission_total = item.product.commission_amount * item.quantity
             if (item.quantity < 6) {
-                item.total = item.product.retail_price * item.quantity
+                item.total = parseFloat(item.product.retail_price * item.quantity).toFixed(2)
             } else {
-                item.total = item.product.wholesale_price * item.quantity
+                item.total = parseFloat(item.product.wholesale_price * item.quantity).toFixed(2)
             }
             commission_total += item.commission_total
             total += item.total
         });
-        order.total = total
-        order.commission_total = commission_total
+        order.total = parseFloat(total).toFixed(2)
+        order.commission_total = parseFloat(commission_total).toFixed(2)
         });
         user.orders = orders
 
@@ -49,11 +49,10 @@ router.get('/seller/:idSeller', isAdmin, async (req, res) => {
     }
 })
 
-router.get('/seller/:idSeller/commission',async(req,res)=>{
+router.get('/seller/:idSeller/commission',isAdmin,async(req,res)=>{
     const { idSeller } = req.params
-    const now = new Date()
-    const nowDate = now.getDate()
     const months = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro']
+    
     try {
         const user = await User.findById(idSeller).lean()
         const orders = await Order.find({seller: user._id}).sort({createdAt: -1}).populate({
@@ -66,11 +65,11 @@ router.get('/seller/:idSeller/commission',async(req,res)=>{
         orders.forEach(order => {
             let commission_total = 0
             order.order_items.forEach((item) => {
-            item.commission_total = item.product.commission_amount * item.quantity
-            commission_total += item.commission_total
+            item.commission_total = parseFloat(item.product.commission_amount * item.quantity).toFixed(2)
+            commission_total += item.commission_total 
         });
         order.date = order.createdAt.getDate().toString() + ' ' + months[order.createdAt.getMonth()] + ' ' + order.createdAt.getFullYear().toString()
-        order.commission_total = commission_total
+        order.commission_total = parseFloat(commission_total).toFixed(2)
         });
 
         const ordersDate = orders.map((order)=> order.date)
@@ -79,8 +78,8 @@ router.get('/seller/:idSeller/commission',async(req,res)=>{
         const sumCommissionByDay = (date) =>{    
             const ordersFilteredByDate = orders.filter((order)=> order.date === date)
             const commissionByOrder = ordersFilteredByDate.map((order)=> order.commission_total)
-            return commissionByOrder.reduce((acc,cu)=> acc + cu,0)
-      
+            const sumCommissionsByOrder =  commissionByOrder.reduce((acc,cu)=> acc + cu,0)
+            return parseFloat(sumCommissionsByOrder).toFixed(2)
           }
           const commissionsByDate = dateOrdersUnique.map((date)=>{return {date,commission: sumCommissionByDay(date)}}) 
 
