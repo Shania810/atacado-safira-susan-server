@@ -4,6 +4,7 @@ const Product = require('../models/product.model')
 const router = Router()
 
 router.get('/order', async (req, res) => {
+    const months = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro']
     try {
         const orders = await Order.find({}).sort({ createdAt: -1 }).populate('client seller').populate({
             path: 'order_items',
@@ -24,8 +25,16 @@ router.get('/order', async (req, res) => {
                 total += item.total
             });
             order.total = parseFloat(total).toFixed(2)
+            order.date = order.createdAt.getDate().toString() +' '+ months[order.createdAt.getMonth()] +' '+ order.createdAt.getFullYear().toString()
         }
-        res.status(200).json(orders)
+        const dateOrders = orders.map((order)=>order.date)
+        const dateUniqueOrders = [...new Set(dateOrders)]
+
+        const ordersFilteredByDate = (date)=>{
+          return orders.filter((order)=> order.date === date )
+        }
+        const dateWithOrdersFiltered = dateUniqueOrders.map((date)=>{return {date,orders:ordersFilteredByDate(date)} })
+        res.status(200).json(dateWithOrdersFiltered)
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
