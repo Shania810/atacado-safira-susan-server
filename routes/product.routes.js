@@ -3,6 +3,7 @@ const Product = require('../models/product.model')
 const Category = require('../models/category.model')
 const Order = require('../models/order.model')
 const isAdmin = require('../middlewares/user.middleware')
+const uploadCloud = require('../config/config.cloudinary')
 const router = Router()
 
 router.get('/product', async (req, res) => {
@@ -50,15 +51,15 @@ router.get('/product/search/:key', async (req, res) => {
 })
 
 router.post('/product', isAdmin, async (req, res) => {
-    let {name,stock,commission_amount,price,wholesale_price,retail_price,description,category} = req.body
-    commission_amount = parseFloat(commission_amount).toFixed(2)
-    price = parseFloat(price).toFixed(2)
-    wholesale_price = parseFloat(wholesale_price).toFixed(2)
-    retail_price = parseFloat(retail_price).toFixed(2)
+    const {name,stock,commission_amount,price,wholesale_price,retail_price,description,category} = req.body
+    const commissionAmount = parseFloat(commission_amount).toFixed(2)
+    const priceBrought = parseFloat(price).toFixed(2)
+    const wholesalePrice = parseFloat(wholesale_price).toFixed(2)
+    const retailPrice = parseFloat(retail_price).toFixed(2)
 
     try {
         const categoryFounded = await Category.findOne({name: category})
-        const newProduct = await Product.create({ name,stock,commission_amount,price,wholesale_price,retail_price,description, category: categoryFounded._id })
+        const newProduct = await Product.create({ name,stock,commission_amount: commissionAmount,price: priceBrought,wholesale_price: wholesalePrice,retail_price: retailPrice,description, category: categoryFounded._id })
         res.status(201).json(newProduct)
     } catch (error) {
         res.status(500).json({ message: error.message })
@@ -103,6 +104,15 @@ router.put('/product/:idProduct', isAdmin, async (req, res) => {
     }
 })
 
+router.put('/product/:idProduct/upload-image',isAdmin,uploadCloud.single('image'),async(req,res)=>{
+  const {idProduct} = req.params
+   try {
+    const updatedProduct = await Product.findByIdAndUpdate(idProduct,{imageUrl: req.file.path},{new: true})
+    res.status(200).json(updatedProduct)
+  } catch (error) {
+    res.status(500).json(error.message)
+  }
+})
 router.delete('/product/:idProduct', isAdmin, async (req, res) => {
     const { idProduct } = req.params
     try {
