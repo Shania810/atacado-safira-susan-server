@@ -107,7 +107,7 @@ router.put('/product/:idProduct', isAdmin, async (req, res) => {
 router.put('/product/:idProduct/upload-image',isAdmin,uploadCloud.single('image'),async(req,res)=>{
   const {idProduct} = req.params
    try {
-    const updatedProduct = await Product.findByIdAndUpdate(idProduct,{imageUrl: req.file.path},{new: true})
+    const updatedProduct = await Product.findByIdAndUpdate(idProduct,{imageURL: req.file.path},{new: true})
     res.status(200).json(updatedProduct)
   } catch (error) {
     res.status(500).json(error.message)
