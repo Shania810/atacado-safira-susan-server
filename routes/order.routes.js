@@ -18,13 +18,13 @@ router.get('/order', async (req, res) => {
             order.order_items.forEach((item) => {
                 item.total = 0
                 if (item.quantity < 6) {
-                    item.total = parseFloat(item.product.retail_price * item.quantity).toFixed(2)
+                    item.total = item.product.retail_price * item.quantity
                 } else {
-                    item.total = parseFloat(item.product.wholesale_price * item.quantity).toFixed(2)
+                    item.total = item.product.wholesale_price * item.quantity
                 }
                 total += item.total
             });
-            order.total = parseFloat(total).toFixed(2)
+            order.total = total
             order.date = order.createdAt.getDate().toString() + ' ' + months[order.createdAt.getMonth()] + ' ' + order.createdAt.getFullYear().toString()
         }
         const dateOrders = orders.map((order) => order.date)
@@ -55,13 +55,13 @@ router.get('/order/:idOrder', async (req, res) => {
         order.order_items.forEach((item) => {
             item.total = 0
             if (item.quantity < 6) {
-                item.total = parseFloat(item.product.retail_price * item.quantity).toFixed(2)
+                item.total = item.product.retail_price * item.quantity
             } else {
-                item.total = parseFloat(item.product.wholesale_price * item.quantity).toFixed(2)
+                item.total = item.product.wholesale_price * item.quantity
             }
             total += item.total
         });
-        order.total = parseFloat(total).toFixed(2)
+        order.total = total
         order.date = order.updatedAt.getDate().toString() + ' ' + months[order.updatedAt.getMonth()] + ' ' + order.updatedAt.getFullYear().toString() + ' ' + order.updatedAt.getHours().toString() + ':' + order.updatedAt.getMinutes().toString()
         res.status(200).json(order)
     } catch (error) {
@@ -85,13 +85,13 @@ router.post('/order', async (req, res) => {
         let total = 0
         order.order_items.forEach((item) => {
             if (item.quantity < 6) {
-                item.total = parseFloat(item.product.retail_price * item.quantity).toFixed(2)
+                item.total = item.product.retail_price * item.quantity
             } else {
-                item.total = parseFloat(item.product.wholesale_price * item.quantity).toFixed(2)
+                item.total = item.product.wholesale_price * item.quantity
             }
             total += item.total
         });
-        order.total = parseFloat(total).toFixed(2)
+        order.total = total
         res.status(201).json(order)
     } catch (error) {
         res.status(500).json({ message: error.message })
